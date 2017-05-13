@@ -31,8 +31,8 @@ public class WeatherFetcher {
     }
 
     // TODO: 5/11/2017 AD Update weather object by location
-    public void getWeatherByLatLong(String latitude, String longtitude, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
-        String url = buildUri(latitude, longtitude);
+    public void getWeatherByLatLong(String latitude, String longitude, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
+        String url = buildUri(latitude, longitude);
         RequestQueue queue = Volley.newRequestQueue(context);
 
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
@@ -42,14 +42,15 @@ public class WeatherFetcher {
     }
 
     private String buildUri(String latitude, String longitude) {
-        //Uri format should match: https://api.darksky.net/forecast/[API_KEY]/[Latitude],[Longtitude]
+        //Uri format should match: https://api.darksky.net/forecast/[API_KEY]/[Latitude],[Longitude]
         //e.g: https://api.darksky.net/forecast/b9941f317f4862af22ea5eb827fb91/35.72,52.44
         Uri.Builder builder = new Uri.Builder();
         builder.scheme("https")
                 .authority(API_BASE_ADDRESS)
                 .appendPath("forecast")
                 .appendPath(API_KEY)
-                .appendPath(latitude + "," + longitude);
+                .appendPath(latitude + "," + longitude)
+                .appendQueryParameter("units", "ca");
 
         String uri = builder.build().toString();
         return uri;
