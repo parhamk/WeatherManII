@@ -23,7 +23,7 @@ import java.util.Locale;
 
 public class FetchAddressIntentService extends IntentService {
 
-    private static final String TAG = "FetchAddressIntentService";
+    private static final String TAG = "FetchAddressIntService";
 
     protected ResultReceiver mReceiver;
 
