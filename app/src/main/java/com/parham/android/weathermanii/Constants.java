@@ -4,7 +4,7 @@ package com.parham.android.weathermanii;
  * Created by parham on 6/16/2017 AD.
  */
 
-public final class Consntans {
+public final class Constants {
     public static final int SUCCESS_RESULT = 0;
     public static final int FAILURE_RESULT = 1;
     public static final String PACKAGE_NAME =

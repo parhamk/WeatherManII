@@ -1,12 +1,17 @@
 package com.parham.android.weathermanii;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+//import android.os.Handler;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+//import android.support.v4.os.ResultReceiver;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,7 +41,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     private Weather mWeather;
     private TextView mTextView;
+    private TextView mTextViewAddress;
     private boolean mRequestingLocationUpdates = true;
+
+    private AddressResultReceiver mResultReceiver;
+    private String mAddressOutput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +63,22 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         mWeather = new Weather();
         mTextView = (TextView) findViewById(R.id.text_view_temperature);
+        mTextViewAddress = (TextView) findViewById(R.id.text_view_address);
     }
+
+    protected void startIntentService() {
+        Intent intent = new Intent(this, FetchAddressIntentService.class);
+        intent.putExtra(Constants.RECEIVER, mResultReceiver);
+        intent.putExtra(Constants.LOCATION_DATA_EXTRA, mLastLocation);
+        startService(intent);
+    }
+
 
     @Override
     public void onLocationChanged(Location location) {
         mLastLocation = location;
         Log.i(TAG, "location has changed to " + mLastLocation.getLatitude() + "   " + mLastLocation.getLongitude());
+        startIntentService();
         updateWeather(mLastLocation);
     }
 
@@ -74,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         if (mLastLocation != null) {
             Log.i(TAG, "last location is: " + mLastLocation.getLatitude() + ", " + mLastLocation.getLongitude());
+            startIntentService();
             updateWeather(mLastLocation);
         }
 
@@ -199,5 +219,30 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mGoogleApiClient.disconnect();
         Log.i(TAG, "Google Api Client is now disconnected");
         super.onStop();
+    }
+
+    class AddressResultReceiver extends ResultReceiver {
+        public AddressResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+
+            // Display the address string
+            // or an error message sent from the intent service.
+            mAddressOutput = resultData.getString(Constants.RESULT_DATA_KEY);
+            displayAddressOutput();
+
+//            // Show a toast message if an address was found.
+//            if (resultCode == Constants.SUCCESS_RESULT) {
+//                showToast(getString(R.string.address_found));
+//            }
+
+        }
+    }
+
+    private void displayAddressOutput() {
+        mTextView.setText(mAddressOutput.toString());
     }
 }
